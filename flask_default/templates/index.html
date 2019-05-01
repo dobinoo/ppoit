@@ -1,58 +1,129 @@
 <!DOCTYPE HTML>
 <html>
  <head>
-  <title>Flask-SocketIO Test</title>
-   <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-   <script type="text/javascript" charset="utf-8">
+   <meta charset="UTF-8">
+   <title>Flask-SocketIO Test</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+   <script src="//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
+   <script type="text/javascript">
      $(document).ready(function() {
       namespace = '/test';
       var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-
-      socket.on('connect', function() {
-        socket.emit('my_event', {data: 'I\'m connected!', value: 1}); });
+	
+      socket.on('state_connected', function(msg) {
+        console.log(msg.data);
+        $('#btnState').html(''+msg.data+'');
+	$('#btnState').prop('value', ''+msg.data+'') });
 
       socket.on('my_response', function(msg) {
         console.log(msg.data);
         $('#log').append('Received #'+msg.count+': '+msg.data+'<br>').html(); });
+      
+      socket.on('ovladanie_LED', function(msg) {
+	$('#btnLED').html(''+msg.data+'') });
 
       $('form#emit').submit(function(event) {
           socket.emit('my_event', {value: $('#emit_value').val()});
           return false; });
-      $('#buttonVal').click(function(event) {
-          //console.log($('#buttonVal').val());
-          socket.emit('click_event', {value: $('#buttonVal').val()});
-          return false; });
 		  
-		  $('#btnStart').click(function(event) {
-          //console.log($('#btnStart').val());
-          socket.emit('e_start', {value: $('#btnStart').val()});
+      $('#btnState').click(function(event) {
+          //console.log($(this).val());
+          socket.emit('e_state', {value: $(this).val()});
           return false; });
-		  
-		  $('#btnStop').click(function(event) {
-          //console.log($('#btnStop').val());
-          socket.emit('e_stop', {value: $('#btnStop').val()});
+	  
+      $('#btnLED').click(function(event) {
+          //console.log($(this).val());
+          socket.emit('svetla', {value: $(this).val()});
           return false; });
+	  
       $('form#disconnect').submit(function(event) {
-          socket.emit('disconnect_request');
-          return false; });         
+	  socket.emit('disconnect_request');
+	  return false; });
+	  
+      $('#speed').on('input', function() {
+	  //console.log($(this).val());
+	  socket.emit('speed_input', {value: $(this).val()});
+          return false;	});
+	  
+      $('#steering').on('input', function() {
+	  //console.log($(this).val());
+	  socket.emit('steering_input', {value: $(this).val()});
+          return false;	});
+      
+      var gauge = new RadialGauge({
+	  renderTo: 'canvas-tachometer',
+	  width: 300,
+	  height: 300,
+	  units: "Km/h",
+	  minValue: 0,
+	  maxValue: 60,
+	  majorTicks: [
+	      "0",
+	      "10",
+	      "20",
+	      "30",
+	      "40",
+	      "50",
+	      "60"
+	  ],
+	  minorTicks: 2,
+	  strokeTicks: true,
+	  highlights: [
+	      {
+		  "from": 50,
+		  "to": 60,
+		  "color": "rgba(200, 50, 50, .75)"
+	      }
+	  ],
+	  colorPlate: "#fff",
+	  borderShadowWidth: 0,
+	  borders: false,
+	  needleType: "arrow",
+	  needleWidth: 2,
+	  needleCircleSize: 7,
+	  needleCircleOuter: true,
+	  needleCircleInner: false,
+	  animationDuration: 1500,
+	  animationRule: "linear"
+      }).draw();
+      // setting value ... gauge.value=500
+      
+      
       });
+      
+      
+      
     </script>
  </head>
  <body>
   <h1>Flask-SocketIO Test</h1>
   <h2>Send:</h2>
+
   <form id="emit" method="POST" action='#'>
     <input type="text" name="emit_value" id="emit_value" placeholder="Amplituda">
     <input type="submit" value="Send">
   </form>
-   <button id="btnStart" type="submit" value="send">Start</button>
-	<button id="btnStop" type="submit" value="send">Stop</button>
-	
-  <button id="buttonVal" type="submit" value="send">Send value</button>
+
+  <button id="btnState" type="submit" value="stop">Stop</button>
+  <button id="btnLED" type="submit" value="send">OFF</button>
+  
+  <p>Speed slider</p>  
+  <div class="slider-container">
+    <input type="range" min="1" max="100" value="0" id="speed">
+  </div>
+  
+  <p>Steering slider</p>  
+  <div class="slider-container">
+    <input type="range" min="1" max="100" value="0" id="steering">
+  </div>
+  
   <form id="disconnect" method="POST" action="#">
     <input type="submit" value="Disconnect">
-  </form> 
+  </form>
+  
+  <canvas id="canvas-tachometer"></canvas>	
+  
   <h2>Receive:</h2>
   <div id="log"></div>
  </body>
