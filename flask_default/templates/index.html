@@ -3,14 +3,20 @@
 
  <head>
    <meta charset="UTF-8">
-   <title>CAR HMI</title>
-    
+   <title>CAR PPOIT</title>
+
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
    <script src="//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
-   <!--<script src="script.js"></script>-->
-   <script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+   <!-- Upravene cesty pre scripty-->
+   <script src="{{ url_for('static', filename='script/script.js') }}"></script>
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+   <!----------------------------------------------------------------------------------------------->
+
+   <!--<script>
    $(document).ready(function() {
 	namespace = '/test';
 	var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -52,31 +58,31 @@
 	//	return false;
 	//});
 	$('#btnAuto').click(function(event) {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('svetla_auto', {value: $(this).val()});
 		return false;
 	});
-	
+
 	$('#btnLED').click(function(event) {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('svetla', {value: $(this).val()});
 		return false;
 	});
 
 	$('#lane_assist').click(function(event) {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('lane_request', {value: $(this).val()});
 		return false;
 	});
 
 	$('#adapt_cruise').click(function(event) {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('cruise_request', {value: $(this).val()});
 		return false;
 	});
 
 	$('#btnState').click(function(event) {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('e_state', {value: $(this).val()});
 		return false;
 	});
@@ -87,13 +93,13 @@
 	});
 
 	$('#speed').on('input', function() {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('speed_input', {value: $(this).val()});
 		return false;
 	});
 
 	$('#steering').on('input', function() {
-		//console.log($(this).val());
+		console.log($(this).val());
 		socket.emit('steering_input', {value: $(this).val()});
 		return false;
 	});
@@ -137,26 +143,23 @@
 	// setting value ... gauge.value=500
 
 });
-   
+
    </script>
-   
+
    <style>
    .row{
 	margin: 0 0 10px 0;
     }
 
-   </style>
-
-   <!--<link rel="stylesheet" href="style.css">-->
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  </style>-->
+<img src="{{ url_for('static', filename='css/logo.png') }}" alt="logo" id="logo">
  </head>
 
  <body>
-
   <div class="container">
-    
+
     <h1>Car HMI</h1>
-    
+<br>
     <div class="row">
       <div class="col-6">
         <canvas id="canvas-tachometer"></canvas>
@@ -165,19 +168,19 @@
         <canvas id="webcam"></canvas>
       </div>
     </div>
-    
-    <div class="row">
+
+    <!--<div class="row">
       <h2>Send:</h2>
-    </div>
-    
+    </div> -->
+
     <div class="row">
 
       <div class="col-4">
 
         <p>Start/Stop</p>
         <button id="btnState" type="submit" value="Start">Start</button>
-      
-        <p>Disconnect request</p>
+
+        <p id="disconnect_button">Disconnect request</p>
         <form id="disconnect" method="POST" action="#">
           <input type="submit" value="Disconnect">
         </form>
@@ -186,18 +189,18 @@
 
       <div class="col-4">
 
-        <p>LED ON/OFF</p>   
+        <p>LED ON/OFF</p>
         <button id="btnLED" type="submit" value="ON">ON</button>
-        <p>LED auto/manual</p>
+        <p id="led">LED auto/manual</p>
         <button id="btnAuto" type="submit" value="Auto">Auto</button>
-      
+
       </div>
 
       <div class="col-4">
 
         <p>Lane Assistante ON/OFF</p>
         <button id="lane_assist" type="submit" value="ON">ON</button>
-        <p>Adaptive Cruise Control</p>
+        <p id="adaptive_control">Adaptive Cruise Control</p>
         <button id="adapt_cruise" type="submit" value="ON">ON</button>
 
       </div>
@@ -208,13 +211,13 @@
 
         <div class="slider-container">
           <label for="speed">Speed slider</label>
-          <input type="range" class="custom-range" min="1" max="100" value="0" id="speed" orient="vertical">
+          <input type="range" class="custom-range" min="0" max="100" value="0" id="speed" orient="vertical">
         </div>
-      
+
       </div>
 
       <div class="col-6">
-          
+
         <div class="slider-container">
           <label for="steering">Steering slider</label>
           <input type="range" class="custom-range" min="1" max="100" value="50" id="steering">
@@ -222,10 +225,15 @@
 
       </div>
     </div>
-    
+
+    <!--
     <h2>Receive:</h2>
     <div id="log"></div>
+    -->
 
   </div>
  </body>
+ <footer>
+   <p>Bc. Boris Dobrovič , Bc. Matúš Hutár , Bc. Martin Supek , Bc. Zdenko Pucovski , Bc. Matej Kubala</p>
+ </footer>
 </html>

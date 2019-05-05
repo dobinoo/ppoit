@@ -1,23 +1,28 @@
 from threading import Lock
 from flask import Flask, render_template, session, request, jsonify, url_for
 from flask_socketio import SocketIO, emit, disconnect
-#import MySQLdb       
 import time
-import random
-import math
+import os
+
+#tieto veci nepotrebujeme
+#import MySQLdb
+#import random
+#import math
 
 import serial
 
-ser = serial.Serial("/dev/ttyACM0", 115200)
+#ser = serial.Serial("/dev/ttyACM0", 115200)
 
 async_mode = None
 
 app = Flask(__name__)
-    
+
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
-thread_lock = Lock() 
+thread_lock = Lock()
+
+
 
 
 LED = 'OFF'
@@ -37,14 +42,15 @@ def background_thread(args):
                         socketio.emit('new_speed',
 						  {'data': read_ser, 'count': count},
 						  namespace='/test')
+
 #			if args:
 #			  A = dict(args).get('A')
 #			  btnV = dict(args).get('btn_value')
 #			else:
 #			  A = 1
-#			  btnV = 'null' 
+#			  btnV = 'null'
 #			print A
-#			print args  
+#			print args
 #			socketio.sleep(1)
 #			count += 1
 #			prem = random.random()
@@ -55,7 +61,7 @@ def background_thread(args):
 #			dataList.append(dataDict)
 #			if len(dataList)>0:
 #			  print str(dataList)
-#			  print str(dataList).replace("'", "\"")      
+#			  print str(dataList).replace("'", "\"")
 #                          socketio.emit('my_response',
 #						  {'data': float(A)*math.sin(time.time()), 'count': count},
 #						  namespace='/test')
@@ -63,11 +69,11 @@ def background_thread(args):
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
-  
+
 @socketio.on('my_event', namespace='/test')
-def test_message(message):   
-    session['receive_count'] = session.get('receive_count', 0) + 1 
-    session['A'] = message['value']    
+def test_message(message):
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    session['A'] = message['value']
     emit('my_response',
          {'data': message['value'], 'count': session['receive_count']})
 
@@ -143,12 +149,12 @@ def test_message(message):
                 if thread is None:
                     thread = socketio.start_background_task(target=background_thread, args=session._get_current_object())
             emit('state_connected', {'data': 'Stop', 'count': 0})
-            print 'startujeeeeeeeeeeeeem'
+            print 'Start (Inicializacia)'
         else:
             state ='Stop'
             emit('state_connected',
                  {'data': 'Start', 'count': 0})
-            print 'konieeeeeeeeeeeeec'
+            print 'Koniec (Stop)'
 
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
@@ -159,14 +165,14 @@ def disconnect_request():
 
 @socketio.on('speed_input', namespace='/test')
 def test_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1 
+    session['receive_count'] = session.get('receive_count', 0) + 1
     session['A'] = message['value']
     emit('my_response',
          {'data': message['value'], 'count': session['receive_count']})
 
 @socketio.on('steering_input', namespace='/test')
 def test_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1 
+    session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': message['value'], 'count': session['receive_count']})
 
