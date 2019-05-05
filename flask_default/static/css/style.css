@@ -1,0 +1,56 @@
+.row{
+	margin: 0px 0px 10px 0;
+	font-size:20px;
+	font-style:normal;
+}
+
+h1{
+	font-size:55px;
+	font-style:bold;
+}
+
+body{
+margin-top:20px;
+margin-left:0px;
+background: #3285de;
+}
+
+#logo{
+
+margin-left:1000px;
+
+}
+
+button {
+margin-left:10px;
+color: rgb(255, 255, 255); font-size: 19px; line-height: 19px; padding: 11px; border-radius: 16px; font-family: Georgia, serif; font-weight: normal; text-decoration: none; font-style: normal; font-variant: normal; text-transform: none; background-image: linear-gradient(rgb(53, 154, 220) 0%, rgb(20, 78, 117) 100%); box-shadow: rgb(0, 0, 0) 5px 5px 15px 5px; border: 2px solid rgb(28, 110, 164); display: inline-block;}
+button:hover {
+background: #1C6EA4; }
+button:active {
+background: #144E75; }
+
+p{
+margin:10px;
+}
+
+#disconnect_button{
+margin-top:50px;
+}
+
+#adaptive_control{
+margin-top:50px;
+}
+
+#led{
+margin-top:50px;
+}
+
+footer{
+margin-top:50px;
+font-size:15px;
+text-align: center;
+}
+
+.slider-container{
+margin-top:60px;
+}
