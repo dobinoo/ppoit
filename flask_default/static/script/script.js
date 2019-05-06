@@ -8,10 +8,13 @@ $(document).ready(function() {
 		$('#btnState').prop('value', ''+msg.data+'');
 	});
 
+
 	socket.on('new_speed', function(msg) {
 		//console.log(msg.data);
 		gauge.value=msg.data;
-		//$('#log').append('Received #'+msg.count+': '+msg.data+'<br>').html();
+		chart_config.labels.push(msg.count);
+		chart_config.datasets[0].push(msg.data);
+		window.myline.update();
 	});
 
 	socket.on('ovladanie_LED', function(msg) {
@@ -34,10 +37,6 @@ $(document).ready(function() {
 		$('#adapt_cruise').prop('value', ''+msg.data+'');
 	});
 
-	//$('form#emit').submit(function(event) {
-	//	socket.emit('my_event', {value: $('#emit_value').val()});
-	//	return false;
-	//});
 	$('#btnAuto').click(function(event) {
 		//console.log($(this).val());
 		socket.emit('svetla_auto', {value: $(this).val()});
@@ -68,7 +67,8 @@ $(document).ready(function() {
 		return false;
 	});
 
-	$('form#disconnect').submit(function(event) {
+	$('#disconnect').click(function(event) {
+		//console.log($(this).val());
 		socket.emit('disconnect_request');
 		return false;
 	});
@@ -122,5 +122,76 @@ $(document).ready(function() {
 		animationRule: "linear"
 	}).draw();
 	// setting value ... gauge.value=500
+	
+	
 
+	(function(){
+		document.getElementById('vid_webcam').href = window.location.protocol + '//' + window.location.hostname + ':8081';
+		//var blob = new Blob(':8081');
+		//var port = window.URL.createObjectURL(blob),
+		//	video = document.getElementById('vid_webcam');
+		//video.src = port;
+		//console.log(port);
+		
+		//var video = document.getElementById('vid_webcam'),
+//			vendorURL = window.URL || window.webkitURL;
+		
+//		navigator.getMedia = 	navigator.getUserMedia ||
+//								navigator.webkitGetUserMedia ||
+//								navigator.mozGetUserMedia ||
+//								navigator.msgetUserMedia;
+//		
+//		navigator.getMedia({
+//			video: true,
+//			audio: false
+//		}, function (stream){
+//			video.src = vendorUrl.createObjectURL(stream);
+//			video.play();
+//		}, function(error){
+//			//error
+//		});
+	})();
 });
+
+var chart_config = {
+	type: 'line',
+	data: {
+		labels: [ 0 ], //y
+		datasets: [{
+			label: "data", 
+			backgroundColor: "#db7749",
+			borderColor: "#db7749",
+			data: [ 0 ], //x
+			fill: false,
+		}]
+	},
+	options: {
+		responsive: true,
+		title:{
+			display: true,
+			text: 'Data from car'
+		},
+		scales:{
+			xAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Time'
+				}
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Value'
+				}
+			}]
+		}
+	}
+};
+
+window.onload = function() {
+	var ctx = document.getElementById('chart').getContext('2d');
+	window.myLine = new Chart(ctx, chart_config);
+};
+

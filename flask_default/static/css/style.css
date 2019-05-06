@@ -12,14 +12,10 @@ h1{
 body{
 margin-top:20px;
 margin-left:0px;
-background: #3285de;
+
+background: #3fa9f8;/*#3285de;*/ 
 }
 
-#logo{
-
-margin-left:1000px;
-
-}
 
 button {
 margin-left:10px;
@@ -27,6 +23,16 @@ color: rgb(255, 255, 255); font-size: 19px; line-height: 19px; padding: 11px; bo
 button:hover {
 background: #1C6EA4; }
 button:active {
+background: #144E75; }
+
+.a_button{
+text-decoration:none;
+margin-top: 30px;
+margin-left:10px;
+color: rgb(255, 255, 255); font-size: 19px; line-height: 19px; padding: 11px; border-radius: 16px; font-family: Georgia, serif; font-weight: normal; text-decoration: none; font-style: normal; font-variant: normal; text-transform: none; background-image: linear-gradient(rgb(53, 154, 220) 0%, rgb(20, 78, 117) 100%); box-shadow: rgb(0, 0, 0) 5px 5px 15px 5px; border: 2px solid rgb(28, 110, 164); display: inline-block;}
+.a_button:hover {
+background: #1C6EA4; }
+.a_button:active {
 background: #144E75; }
 
 p{
