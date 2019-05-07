@@ -23,11 +23,11 @@
   <header>
     <div class="container">
       <div class="row">
-	<img src="{{ url_for('static', filename='css/logo.png') }}" alt="logo" id="logo" class="pull-right img-responsive">	      
+	<img src="{{ url_for('static', filename='css/logo.png') }}" alt="logo" id="logo" class="pull-right img-responsive">
       </div>
     </div>
   </header>
-  
+
   <div class="container">
 
     <h1>Car HMI</h1>
@@ -37,7 +37,9 @@
         <canvas id="canvas-tachometer"></canvas>
       </div>
       <div class="col-6">
-	<canvas id="chart"></canvas>
+	       <canvas id="chart"></canvas>
+         <!-- Tuto vymen IP kamery funguje-->
+         <iframe src="http://192.168.0.111:8081"></iframe>
       </div>
     </div>
 
@@ -50,7 +52,7 @@
 
         <p id="disconnect_button">Disconnect request</p>
 	<button id="disconnect" type="submit" value="Disconnect">Disconnect</button>
-        
+
       </div>
 
       <div class="col-4">
@@ -91,15 +93,16 @@
 
       </div>
     </div>
-    
+
     <div class="row">
 	<a class="a_button" id="vid_webcam">Video Stream</a>
     </div>
 
   </div>
  </body>
- 
+
  <footer>
    <p>Bc. Boris Dobrovič , Bc. Matúš Hutár , Bc. Martin Supek , Bc. Zdenko Pucovski , Bc. Matej Kubala</p>
  </footer>
 </html>
+..
