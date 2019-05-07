@@ -158,23 +158,27 @@ def test_message(message):
 
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']})
+    #session['receive_count'] = session.get('receive_count', 0) + 1
+    #emit('my_response',
+    #     {'data': 'Disconnected!', 'count': session['receive_count']})
     disconnect()
 
 @socketio.on('speed_input', namespace='/test')
 def test_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    session['A'] = message['value']
-    emit('my_response',
-         {'data': message['value'], 'count': session['receive_count']})
+    global state
+    if state == 'Start':
+        session['receive_count'] = session.get('receive_count', 0) + 1
+        #session['A'] = message['value']
+        emit('new_speed',
+            {'data': message['value'], 'count': session['receive_count']})
 
 @socketio.on('steering_input', namespace='/test')
 def test_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['value'], 'count': session['receive_count']})
+    global state
+    if state == 'Start':
+        session['receive_count'] = session.get('receive_count', 0) + 1
+        emit('my_response',
+            {'data': message['value'], 'count': session['receive_count']})
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=80, debug=True)

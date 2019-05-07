@@ -12,9 +12,13 @@ $(document).ready(function() {
 	socket.on('new_speed', function(msg) {
 		//console.log(msg.data);
 		gauge.value=msg.data;
-		chart_config.labels.push(msg.count);
-		chart_config.datasets[0].push(msg.data);
-		window.myline.update();
+		myLine.data.labels.push(msg.count);
+		myLine.data.datasets.forEach((dataset) => {dataset.data.push(msg.data)});
+		if (msg.count > 30){
+			myLine.data.labels.shift();
+			myLine.data.datasets.forEach((dataset) => {dataset.data.shift()})
+		}
+		myLine.update();
 	});
 
 	socket.on('ovladanie_LED', function(msg) {
@@ -118,10 +122,10 @@ $(document).ready(function() {
 		needleCircleSize: 7,
 		needleCircleOuter: true,
 		needleCircleInner: false,
-		animationDuration: 1500,
+		animationDuration: 100,
 		animationRule: "linear"
 	}).draw();
-	// setting value ... gauge.value=500
+	
 	
 	
 
@@ -158,7 +162,7 @@ var chart_config = {
 	data: {
 		labels: [ 0 ], //y
 		datasets: [{
-			label: "data", 
+			label: "Speed", 
 			backgroundColor: "#db7749",
 			borderColor: "#db7749",
 			data: [ 0 ], //x
@@ -190,8 +194,11 @@ var chart_config = {
 	}
 };
 
-window.onload = function() {
+window.onload = function(global) {
 	var ctx = document.getElementById('chart').getContext('2d');
-	window.myLine = new Chart(ctx, chart_config);
+	myLine = new Chart(ctx, chart_config);
 };
+
+
+
 
