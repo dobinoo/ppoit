@@ -22,26 +22,59 @@ socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
-
-
-
 LED = 'OFF'
 LED_mode = 'Manual'
 state = 'Stop'
 cruise_state = 'OFF'
 lane_state = 'OFF'
+speed_value = 0
+steering_value = 0
+
+udaje = ""
+
+def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
+    global udaje
+    if status=='Start':
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+    if tempomat=="ON":
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+    if asistent=="ON":
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+    if led=="ON":
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+    if led_mode=="Auto":
+        udaje = udaje + "1" #auto
+    else:
+        udaje = udaje + "0" #manual
+    udaje = udaje + str(rychlost)
+    udaje = udaje + str(zatocenie)
+    
 
 def background_thread(args):
     count = 0
-    dataList = []
+    #dataList = []
     while True:
-		socketio.sleep(0.1)
-		if state=='Start':
-                        read_ser = ser.readline()
-                        print (read_ser)
-                        socketio.emit('new_speed',
-						  {'data': read_ser, 'count': count},
-						  namespace='/test')
+        global udaje
+        socketio.sleep(0.1)
+        udaje = ""
+        vypln_udaje(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value)
+        print (udaje)
+        #if state=='Start':
+            #ser.write(udaje)
+            
+
+
+#            socketio.emit('new_speed',
+#              {'data': read_ser, 'count': count},
+#              namespace='/test')
 
 #			if args:
 #			  A = dict(args).get('A')
@@ -86,12 +119,10 @@ def test_message(message):
                 LED='ON'
                 emit('ovladanie_LED',
                          {'data': 'OFF' })
-                ser.write('svetla_ON')
             else:
                 LED='OFF'
                 emit('ovladanie_LED',
                          {'data': 'ON' })
-                ser.write('svetla_OFF')
             print LED
 
 @socketio.on('svetla_auto', namespace='/test')
@@ -166,7 +197,9 @@ def disconnect_request():
 @socketio.on('speed_input', namespace='/test')
 def test_message(message):
     global state
+    global speed_value
     if state == 'Start':
+        speed_value = message['value']
         session['receive_count'] = session.get('receive_count', 0) + 1
         #session['A'] = message['value']
         emit('new_speed',
@@ -174,11 +207,13 @@ def test_message(message):
 
 @socketio.on('steering_input', namespace='/test')
 def test_message(message):
+    global steering_value
     global state
     if state == 'Start':
-        session['receive_count'] = session.get('receive_count', 0) + 1
-        emit('my_response',
-            {'data': message['value'], 'count': session['receive_count']})
+        steering_value = message['value']
+        #session['receive_count'] = session.get('receive_count', 0) + 1
+        #emit('my_response',
+        #    {'data': message['value'], 'count': session['receive_count']})
 
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=80, debug=True)

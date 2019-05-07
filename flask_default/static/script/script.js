@@ -11,7 +11,7 @@ $(document).ready(function() {
 
 	socket.on('new_speed', function(msg) {
 		//console.log(msg.data);
-		gauge.value=msg.data;
+		gauge.value=msg.data;		
 		myLine.data.labels.push(msg.count);
 		myLine.data.datasets.forEach((dataset) => {dataset.data.push(msg.data)});
 		if (msg.count > 30){
@@ -125,35 +125,9 @@ $(document).ready(function() {
 		animationDuration: 100,
 		animationRule: "linear"
 	}).draw();
-	
-	
-	
 
 	(function(){
 		document.getElementById('vid_webcam').href = window.location.protocol + '//' + window.location.hostname + ':8081';
-		//var blob = new Blob(':8081');
-		//var port = window.URL.createObjectURL(blob),
-		//	video = document.getElementById('vid_webcam');
-		//video.src = port;
-		//console.log(port);
-		
-		//var video = document.getElementById('vid_webcam'),
-//			vendorURL = window.URL || window.webkitURL;
-		
-//		navigator.getMedia = 	navigator.getUserMedia ||
-//								navigator.webkitGetUserMedia ||
-//								navigator.mozGetUserMedia ||
-//								navigator.msgetUserMedia;
-//		
-//		navigator.getMedia({
-//			video: true,
-//			audio: false
-//		}, function (stream){
-//			video.src = vendorUrl.createObjectURL(stream);
-//			video.play();
-//		}, function(error){
-//			//error
-//		});
 	})();
 });
 
@@ -198,7 +172,4 @@ window.onload = function(global) {
 	var ctx = document.getElementById('chart').getContext('2d');
 	myLine = new Chart(ctx, chart_config);
 };
-
-
-
 
