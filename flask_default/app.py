@@ -34,29 +34,35 @@ udaje = ""
 
 def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
     global udaje
+
     if status=='Start':
         udaje = udaje + "1"
     else:
         udaje = udaje + "0"
+
     if tempomat=="ON":
         udaje = udaje + "1"
     else:
         udaje = udaje + "0"
+
     if asistent=="ON":
         udaje = udaje + "1"
     else:
         udaje = udaje + "0"
+
     if led=="ON":
         udaje = udaje + "1"
     else:
         udaje = udaje + "0"
+
     if led_mode=="Auto":
         udaje = udaje + "1" #auto
     else:
         udaje = udaje + "0" #manual
+
     udaje = udaje + str(rychlost)
     udaje = udaje + str(zatocenie)
-    
+
 
 def background_thread(args):
     count = 0
@@ -69,7 +75,7 @@ def background_thread(args):
         print (udaje)
         #if state=='Start':
             #ser.write(udaje)
-            
+
 
 
 #            socketio.emit('new_speed',
