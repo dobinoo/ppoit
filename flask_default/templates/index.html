@@ -38,11 +38,6 @@
       </div>
       <div class="col-6">
 	       <canvas id="chart"></canvas>
-         <!-- Tuto vymen IP kamery funguje-->
-         <!-- Je mozne definovat rozmer (height width) mozeme potom nastavit rovnaky ako ma kamera -->
-         <iframe src="http://192.168.0.111:8081" scrolling=no>
-           <p>Browser nepodporuje iframe</p>
-         </iframe>
       </div>
     </div>
 
@@ -82,7 +77,7 @@
 
         <div class="slider-container">
           <label for="speed">Speed slider</label>
-          <input type="range" class="custom-range" min="0" max="60" value="0" id="speed" orient="vertical">
+          <input type="range" class="custom-range" min="0" max="100" value="0" id="speed" >
         </div>
 
       </div>
@@ -91,14 +86,24 @@
 
         <div class="slider-container">
           <label for="steering">Steering slider</label>
-          <input type="range" class="custom-range" min="1" max="100" value="50" id="steering">
+          <input type="range" class="custom-range" min="0" max="100" value="50" id="steering">
         </div>
 
       </div>
     </div>
 
     <div class="row">
-	<a class="a_button" id="vid_webcam">Video Stream</a>
+      <div class="col-6">
+        <a class="a_button" id="vid_webcam">Video Stream</a>
+      </div>
+      <div class="col-6">
+        <!-- Tuto vymen IP kamery funguje-->
+        <!-- Je mozne definovat rozmer (height width) mozeme potom nastavit rovnaky ako ma kamera
+        <iframe src="http://192.168.0.54:8081" scrolling=no>
+          <p>Browser nepodporuje iframe</p>
+        </iframe> -->
+      </div>
+      
     </div>
 
   </div>

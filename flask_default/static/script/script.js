@@ -93,9 +93,9 @@ $(document).ready(function() {
 		renderTo: 'canvas-tachometer',
 		width: 300,
 		height: 300,
-		units: "Km/h",
+		units: "%",
 		minValue: 0,
-		maxValue: 60,
+		maxValue: 100,
 		majorTicks: [
 			"0",
 			"10",
@@ -103,14 +103,18 @@ $(document).ready(function() {
 			"30",
 			"40",
 			"50",
-			"60"
+			"60",
+			"70",
+			"80",
+			"90",
+			"100",
 		],
 		minorTicks: 2,
 		strokeTicks: true,
 		highlights: [
 			{
-			"from": 50,
-			"to": 60,
+			"from": 70,
+			"to": 100,
 			"color": "rgba(200, 50, 50, .75)"
 			}
 		],

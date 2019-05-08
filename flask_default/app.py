@@ -28,7 +28,7 @@ state = 'Stop'
 cruise_state = 'OFF'
 lane_state = 'OFF'
 speed_value = 0
-steering_value = 0
+steering_value = 50
 
 udaje = ""
 
