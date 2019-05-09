@@ -43,17 +43,26 @@
 
     <div class="row">
 
-      <div class="col-4">
+      <div class="col-3">
 
         <p>Start/Stop</p>
         <button id="btnState" type="submit" value="Start">Start</button>
 
         <p id="disconnect_button">Disconnect request</p>
-	<button id="disconnect" type="submit" value="Disconnect">Disconnect</button>
+        <button id="disconnect" type="submit" value="Disconnect">Disconnect</button>
+
+      </div>
+      
+      <div class="col-3">
+
+        <p>Remote/Web Control</p>
+        <button id="control" type="submit" value="Web">Web</button>
+        <p id="adaptive_control">WebCam Streaming</p>
+        <a class="a_button" id="vid_webcam">Video Stream</a>
 
       </div>
 
-      <div class="col-4">
+      <div class="col-3">
 
         <p>LED ON/OFF</p>
         <button id="btnLED" type="submit" value="ON">ON</button>
@@ -62,7 +71,7 @@
 
       </div>
 
-      <div class="col-4">
+      <div class="col-3">
 
         <p>Lane Assistante ON/OFF</p>
         <button id="lane_assist" type="submit" value="ON">ON</button>
@@ -92,7 +101,7 @@
       </div>
     </div>
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-6">
         <a class="a_button" id="vid_webcam">Video Stream</a>
       </div>
@@ -101,10 +110,10 @@
         <!-- Je mozne definovat rozmer (height width) mozeme potom nastavit rovnaky ako ma kamera
         <iframe src="http://192.168.0.54:8081" scrolling=no>
           <p>Browser nepodporuje iframe</p>
-        </iframe> -->
+        </iframe>
       </div>
       
-    </div>
+    </div>-->
 
   </div>
  </body>

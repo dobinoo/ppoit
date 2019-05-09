@@ -29,6 +29,7 @@ cruise_state = 'OFF'
 lane_state = 'OFF'
 speed_value = 0
 steering_value = 50
+control = "Remote"
 
 udaje = ""
 
@@ -36,16 +37,6 @@ def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
     global udaje
 
     if status=='Start':
-        udaje = udaje + "1"
-    else:
-        udaje = udaje + "0"
-
-    if tempomat=="ON":
-        udaje = udaje + "1"
-    else:
-        udaje = udaje + "0"
-
-    if asistent=="ON":
         udaje = udaje + "1"
     else:
         udaje = udaje + "0"
@@ -60,8 +51,24 @@ def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
     else:
         udaje = udaje + "0" #manual
 
-    udaje = udaje + str(rychlost)
-    udaje = udaje + str(zatocenie)
+    if asistent=="ON":
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+        
+    if tempomat=="ON":
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+
+    if control=="Web":
+        udaje = udaje + "1"
+    else:
+        udaje = udaje + "0"
+
+    udaje = udaje + "{:03d}".format(int(rychlost))
+    udaje = udaje + "{:03d}".format(int(zatocenie))
+    udaje = udaje + "R"
 
 
 def background_thread(args):
@@ -175,6 +182,21 @@ def test_message(message):
                 emit('cruise_response',
                          {'data': 'ON' })
             print cruise_state
+            
+@socketio.on('control_state', namespace='/test')
+def test_message(message):
+	global state
+	global control
+	if state == 'Start':
+            if control == 'Remote':
+                control = 'Web'
+                emit('control_response',
+                         {'data': 'Remote' })
+            else:
+                control = 'Remote'
+                emit('control_response',
+                         {'data': 'Web' })
+            print control
 
 @socketio.on('e_state', namespace='/test')
 def test_message(message):

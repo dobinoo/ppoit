@@ -30,6 +30,11 @@ $(document).ready(function() {
 		$('#btnAuto').html(''+msg.data+'');
 		$('#btnAuto').prop('value', ''+msg.data+'');
 	});
+	
+	socket.on('control_response', function(msg) {
+		$('#control').html(''+msg.data+'');
+		$('#control').prop('value', ''+msg.data+'');
+	});
 
 	socket.on('lane_response', function(msg) {
 		$('#lane_assist').html(''+msg.data+'');
@@ -68,6 +73,12 @@ $(document).ready(function() {
 	$('#btnState').click(function(event) {
 		//console.log($(this).val());
 		socket.emit('e_state', {value: $(this).val()});
+		return false;
+	});
+	
+	$('#control').click(function(event) {
+		//console.log($(this).val());
+		socket.emit('control_state', {value: $(this).val()});
 		return false;
 	});
 
