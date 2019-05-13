@@ -3,6 +3,7 @@ from flask import Flask, render_template, session, request, jsonify, url_for
 from flask_socketio import SocketIO, emit, disconnect
 import time
 import os
+import csv
 
 #tieto veci nepotrebujeme
 #import MySQLdb
@@ -33,6 +34,33 @@ control = "Remote"
 
 udaje = ""
 
+##############################ukladanie dat
+def data(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
+
+    with open('data.csv', mode='a') as data:
+        data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow([led,led_mode,status,tempomat,asistent,rychlost,zatocenie])
+
+
+
+
+def data_start_stop(number):
+
+    with open('data.csv', mode='a') as data:
+        data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+        if(number == "1"):
+            data_writer.writerow([time.asctime()])
+            data_writer.writerow(['LED','LED_mode','state','cruise_state','lane_state','speed_value','steering_value'])
+
+
+        if(number == "0"):
+            data_writer.writerow([])
+            data_writer.writerow([])
+
+
+    #####################################################################################
+
 def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
     global udaje
 
@@ -55,7 +83,7 @@ def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
         udaje = udaje + "1"
     else:
         udaje = udaje + "0"
-        
+
     if tempomat=="ON":
         udaje = udaje + "1"
     else:
@@ -78,8 +106,10 @@ def background_thread(args):
         global udaje
         socketio.sleep(0.1)
         udaje = ""
-        vypln_udaje(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value)
-        print (udaje)
+        if(state == "Start"):
+            vypln_udaje(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value)
+            data(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value)
+            print (udaje)
         #if state=='Start':
             #ser.write(udaje)
 
@@ -182,7 +212,7 @@ def test_message(message):
                 emit('cruise_response',
                          {'data': 'ON' })
             print cruise_state
-            
+
 @socketio.on('control_state', namespace='/test')
 def test_message(message):
 	global state
@@ -204,16 +234,31 @@ def test_message(message):
 	if state == 'Stop':
             state = 'Start'
             global thread
+            global past
             with thread_lock:
                 if thread is None:
                     thread = socketio.start_background_task(target=background_thread, args=session._get_current_object())
             emit('state_connected', {'data': 'Stop', 'count': 0})
             print 'Start (Inicializacia)'
+            ###########pridany cas########
+            past=time.time()
+            ##############################
+            #########zapisovanie_dat#######3
+            data_start_stop("1")
+            print("Start zapisovania dat")
+            ###############################
         else:
             state ='Stop'
             emit('state_connected',
                  {'data': 'Start', 'count': 0})
             print 'Koniec (Stop)'
+            ###########pridany cas########
+            past=0
+            ##############################
+            #########zapisovanie_dat#######3
+            data_start_stop("0")
+            print("Ukoncenie zapisovania dat")
+            ###############################s
 
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
@@ -228,10 +273,12 @@ def test_message(message):
     global speed_value
     if state == 'Start':
         speed_value = message['value']
-        session['receive_count'] = session.get('receive_count', 0) + 1
+        now=time.time()-past
+        #session['receive_count'] = session.get('receive_count', 0) + 1
         #session['A'] = message['value']
         emit('new_speed',
-            {'data': message['value'], 'count': session['receive_count']})
+             {'data': message['value'], 'count': int(now)})
+            #{'data': message['value'], 'count': session['receive_count']})
 
 @socketio.on('steering_input', namespace='/test')
 def test_message(message):

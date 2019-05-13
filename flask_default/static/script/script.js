@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	namespace = '/test';
 	var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+	var graph_sample=0
 
 	socket.on('state_connected', function(msg) {
 		//console.log(msg.data);
@@ -11,10 +12,12 @@ $(document).ready(function() {
 
 	socket.on('new_speed', function(msg) {
 		//console.log(msg.data);
-		gauge.value=msg.data;		
+		gauge.value=msg.data;
 		myLine.data.labels.push(msg.count);
 		myLine.data.datasets.forEach((dataset) => {dataset.data.push(msg.data)});
-		if (msg.count > 30){
+		graph_sample = graph_sample +1
+		if (graph_sample>16){//(msg.count > 30){
+			graph_sample = graph_sample -1
 			myLine.data.labels.shift();
 			myLine.data.datasets.forEach((dataset) => {dataset.data.shift()})
 		}
@@ -30,7 +33,7 @@ $(document).ready(function() {
 		$('#btnAuto').html(''+msg.data+'');
 		$('#btnAuto').prop('value', ''+msg.data+'');
 	});
-	
+
 	socket.on('control_response', function(msg) {
 		$('#control').html(''+msg.data+'');
 		$('#control').prop('value', ''+msg.data+'');
@@ -75,7 +78,7 @@ $(document).ready(function() {
 		socket.emit('e_state', {value: $(this).val()});
 		return false;
 	});
-	
+
 	$('#control').click(function(event) {
 		//console.log($(this).val());
 		socket.emit('control_state', {value: $(this).val()});
@@ -151,7 +154,7 @@ var chart_config = {
 	data: {
 		labels: [ 0 ], //y
 		datasets: [{
-			label: "Speed", 
+			label: "Speed",
 			backgroundColor: "#db7749",
 			borderColor: "#db7749",
 			data: [ 0 ], //x
@@ -187,4 +190,3 @@ window.onload = function(global) {
 	var ctx = document.getElementById('chart').getContext('2d');
 	myLine = new Chart(ctx, chart_config);
 };
-
