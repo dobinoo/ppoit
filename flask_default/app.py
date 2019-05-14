@@ -12,7 +12,7 @@ import csv
 
 import serial
 
-#ser = serial.Serial("/dev/ttyACM0", 115200)
+ser = serial.Serial("/dev/ttyUSB0", 115200)
 
 async_mode = None
 
@@ -35,11 +35,11 @@ control = "Remote"
 udaje = ""
 
 ##############################ukladanie dat
-def data(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
+def data(led, led_mode, status, tempomat, asistent, rychlost, zatocenie, control):
 
     with open('data.csv', mode='a') as data:
         data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        data_writer.writerow([led,led_mode,status,tempomat,asistent,rychlost,zatocenie])
+        data_writer.writerow([led,led_mode,status,tempomat,asistent,rychlost,zatocenie,control])
 
 
 
@@ -51,7 +51,7 @@ def data_start_stop(number):
 
         if(number == "1"):
             data_writer.writerow([time.asctime()])
-            data_writer.writerow(['LED','LED_mode','state','cruise_state','lane_state','speed_value','steering_value'])
+            data_writer.writerow(['LED','LED_mode','state','cruise_state','lane_state','speed_value','steering_value', 'control'])
 
 
         if(number == "0"):
@@ -61,7 +61,7 @@ def data_start_stop(number):
 
     #####################################################################################
 
-def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie):
+def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie, control):
     global udaje
 
     if status=='Start':
@@ -107,40 +107,11 @@ def background_thread(args):
         socketio.sleep(0.1)
         udaje = ""
         if(state == "Start"):
-            vypln_udaje(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value)
-            data(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value)
+            vypln_udaje(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value, control)
+            data(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value, control)
             print (udaje)
-        #if state=='Start':
-            #ser.write(udaje)
+            ser.write(udaje)
 
-
-
-#            socketio.emit('new_speed',
-#              {'data': read_ser, 'count': count},
-#              namespace='/test')
-
-#			if args:
-#			  A = dict(args).get('A')
-#			  btnV = dict(args).get('btn_value')
-#			else:
-#			  A = 1
-#			  btnV = 'null'
-#			print A
-#			print args
-#			socketio.sleep(1)
-#			count += 1
-#			prem = random.random()
-#			dataDict = {
-#			  "t": time.time(),
-#			  "x": count,
-#			  "y": float(A)*prem}
-#			dataList.append(dataDict)
-#			if len(dataList)>0:
-#			  print str(dataList)
-#			  print str(dataList).replace("'", "\"")
-#                          socketio.emit('my_response',
-#						  {'data': float(A)*math.sin(time.time()), 'count': count},
-#						  namespace='/test')
 
 @app.route('/')
 def index():
@@ -262,6 +233,9 @@ def test_message(message):
 
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
+    global state
+    state='Stop'
+    data_start_stop("0")
     #session['receive_count'] = session.get('receive_count', 0) + 1
     #emit('my_response',
     #     {'data': 'Disconnected!', 'count': session['receive_count']})
