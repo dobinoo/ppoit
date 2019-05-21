@@ -211,25 +211,24 @@ def test_message(message):
                     thread = socketio.start_background_task(target=background_thread, args=session._get_current_object())
             emit('state_connected', {'data': 'Stop', 'count': 0})
             print 'Start (Inicializacia)'
-            ###########pridany cas########
-            past=time.time()
-            ##############################
+            past=time.time()###########pridany cas########
+
             #########zapisovanie_dat#######3
             data_start_stop("1")
             print("Start zapisovania dat")
-            ###############################
+
         else:
             state ='Stop'
             emit('state_connected',
                  {'data': 'Start', 'count': 0})
             print 'Koniec (Stop)'
-            ###########pridany cas########
-            past=0
-            ##############################
-            #########zapisovanie_dat#######3
+            past=0 ###########pridany cas########
+
+            #######zapisovanie dat
             data_start_stop("0")
             print("Ukoncenie zapisovania dat")
-            ###############################s
+            ser.write("000000000050R")
+            print("Poslanie posledneho stringu do arduina (0 0 0 0 0 0 000 050 R)")
 
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
