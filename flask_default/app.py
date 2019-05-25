@@ -1,28 +1,30 @@
+#importy na pouzivanie funkcii
 from threading import Lock
 from flask import Flask, render_template, session, request, jsonify, url_for
 from flask_socketio import SocketIO, emit, disconnect
 import time
 import os
 import csv
+import serial
 
 #tieto veci nepotrebujeme
 #import MySQLdb
 #import random
 #import math
 
-import serial
-
+#arduino(data)
 ser = serial.Serial("/dev/ttyUSB0", 115200)
 
 async_mode = None
-
 app = Flask(__name__)
 
+#serververove nastavenia
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
 
+#Defaultne hodnoty
 LED = 'OFF'
 LED_mode = 'Manual'
 state = 'Stop'
@@ -31,10 +33,9 @@ lane_state = 'OFF'
 speed_value = 0
 steering_value = 50
 control = "Remote"
-
 udaje = ""
 
-##############################ukladanie dat
+#Funkcia na vytvaranie suboru data.csv
 def data(led, led_mode, status, tempomat, asistent, rychlost, zatocenie, control):
 
     with open('data.csv', mode='a') as data:
@@ -43,7 +44,7 @@ def data(led, led_mode, status, tempomat, asistent, rychlost, zatocenie, control
 
 
 
-
+#Pridanie zaciatku a konca do suboru
 def data_start_stop(number):
 
     with open('data.csv', mode='a') as data:
@@ -59,8 +60,7 @@ def data_start_stop(number):
             data_writer.writerow([])
 
 
-    #####################################################################################
-
+#Formatovanie hodnot do string na poslanie
 def vypln_udaje(led, led_mode, status, tempomat, asistent, rychlost, zatocenie, control):
     global udaje
 
@@ -106,13 +106,15 @@ def background_thread(args):
         global udaje
         socketio.sleep(0.1)
         udaje = ""
+
+        #posielanie udajov do serial portu
         if(state == "Start"):
             vypln_udaje(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value, control)
             data(LED, LED_mode, state, cruise_state, lane_state, speed_value, steering_value, control)
             print (udaje)
             ser.write(udaje)
 
-
+#Nacitanie default stranky pre cestu "/"
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
@@ -124,6 +126,7 @@ def test_message(message):
     emit('my_response',
          {'data': message['value'], 'count': session['receive_count']})
 
+#Svetla on/off
 @socketio.on('svetla', namespace='/test')
 def test_message(message):
 	global LED
@@ -139,6 +142,7 @@ def test_message(message):
                          {'data': 'ON' })
             print LED
 
+#Automaticke svetla(podla intenzity svetla) on/off
 @socketio.on('svetla_auto', namespace='/test')
 def test_message(message):
 	global LED_mode
@@ -154,6 +158,7 @@ def test_message(message):
                          {'data': 'Manual' })
             print LED_mode
 
+#Ciarovy assistent
 @socketio.on('lane_request', namespace='/test')
 def test_message(message):
 	global state
@@ -169,6 +174,7 @@ def test_message(message):
                          {'data': 'ON' })
             print lane_state
 
+#Adaptivny tempomat
 @socketio.on('cruise_request', namespace='/test')
 def test_message(message):
 	global state
@@ -184,6 +190,7 @@ def test_message(message):
                          {'data': 'ON' })
             print cruise_state
 
+#Ovladanie ovladac/web
 @socketio.on('control_state', namespace='/test')
 def test_message(message):
 	global state
@@ -199,9 +206,12 @@ def test_message(message):
                          {'data': 'Web' })
             print control
 
+#Kontrolujeme stav START/STOP
 @socketio.on('e_state', namespace='/test')
 def test_message(message):
 	global state
+
+    #Inicializacia
 	if state == 'Stop':
             state = 'Start'
             global thread
@@ -211,9 +221,11 @@ def test_message(message):
                     thread = socketio.start_background_task(target=background_thread, args=session._get_current_object())
             emit('state_connected', {'data': 'Stop', 'count': 0})
             print 'Start (Inicializacia)'
-            past=time.time()###########pridany cas########
 
-            #########zapisovanie_dat#######3
+            #Ziskanie aktualneho casu pri stlaceni start
+            past=time.time()
+
+            #Generovanie dat do hlavicky data.csv
             data_start_stop("1")
             print("Start zapisovania dat")
 
@@ -222,14 +234,19 @@ def test_message(message):
             emit('state_connected',
                  {'data': 'Start', 'count': 0})
             print 'Koniec (Stop)'
-            past=0 ###########pridany cas########
 
-            #######zapisovanie dat
+            #Vynulovanie casu
+            past=0
+
+            #Generovanie dat do footer-u data.csv
             data_start_stop("0")
             print("Ukoncenie zapisovania dat")
+
+            #Poslanie posledneho retazca
             ser.write("000000000050R")
             print("Poslanie posledneho stringu do arduina (0 0 0 0 0 0 000 050 R)")
 
+#Odpojenie zo servera
 @socketio.on('disconnect_request', namespace='/test')
 def disconnect_request():
     global state
@@ -239,7 +256,9 @@ def disconnect_request():
     #emit('my_response',
     #     {'data': 'Disconnected!', 'count': session['receive_count']})
     disconnect()
+    print("\nDISCONNECTED\n\n")
 
+#Rychlost
 @socketio.on('speed_input', namespace='/test')
 def test_message(message):
     global state
@@ -253,6 +272,7 @@ def test_message(message):
              {'data': message['value'], 'count': int(now)})
             #{'data': message['value'], 'count': session['receive_count']})
 
+#Riadenie
 @socketio.on('steering_input', namespace='/test')
 def test_message(message):
     global steering_value
@@ -263,5 +283,6 @@ def test_message(message):
         #emit('my_response',
         #    {'data': message['value'], 'count': session['receive_count']})
 
+#Main funkcia a spustenie serveru localhost, port 80
 if __name__ == '__main__':
     socketio.run(app, host="0.0.0.0", port=80, debug=True)

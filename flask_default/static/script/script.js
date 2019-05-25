@@ -1,15 +1,123 @@
+//Funkcnost ak uz je stranka bezpecne nacitana
 $(document).ready(function() {
 	namespace = '/test';
 	var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 	var graph_sample=0
 
+
+////////////////////////////////////////////////////////////
+//////////////BLABLABLABLABLA///////////////////////////////
+
+//Start/Stop
 	socket.on('state_connected', function(msg) {
 		//console.log(msg.data);
-		$('#btnState').html(''+msg.data+'');
-		$('#btnState').prop('value', ''+msg.data+'');
+		$('#state').html(''+msg.data+'');
+		$('#state').prop('value', ''+msg.data+'');
 	});
 
 
+	//Svetla on/off
+	socket.on('ovladanie_LED', function(msg) {
+		$('#led_on_off').html(''+msg.data+'');
+		$('#led_on_off').prop('value', ''+msg.data+'');
+	});
+
+	//Automaticke svetla on/off
+	socket.on('auto_LED', function(msg) {
+		$('#led_manual_auto').html(''+msg.data+'');
+		$('#led_manual_auto').prop('value', ''+msg.data+'');
+	});
+
+	//Ovladanie remote/web
+	socket.on('control_response', function(msg) {
+		$('#control').html(''+msg.data+'');
+		$('#control').prop('value', ''+msg.data+'');
+	});
+
+	//Lane assist on/off
+	socket.on('lane_response', function(msg) {
+		$('#lane_assist').html(''+msg.data+'');
+		$('#lane_assist').prop('value', ''+msg.data+'');
+	});
+
+	//Adaptivny tempomat
+	socket.on('cruise_response', function(msg) {
+		$('#adapt_cruise').html(''+msg.data+'');
+		$('#adapt_cruise').prop('value', ''+msg.data+'');
+	});
+////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////
+//////////Posielanie dat clientovi/////////////////
+
+	//Automaticke svetla on/off
+	$('#led_manual_auto').click(function(event) {
+		console.log($(this).val());
+		socket.emit('svetla_auto', {value: $(this).val()});
+		return false;
+	});
+
+	//Svetla on/off
+	$('#led_on_off').click(function(event) {
+	  console.log($(this).val());
+		socket.emit('svetla', {value: $(this).val()});
+		return false;
+	});
+
+	//Lane assist on/off
+	$('#lane_assist').click(function(event) {
+		console.log($(this).val());
+		socket.emit('lane_request', {value: $(this).val()});
+		return false;
+	});
+
+	//Adaptivny tempomat
+	$('#adapt_cruise').click(function(event) {
+		console.log($(this).val());
+		socket.emit('cruise_request', {value: $(this).val()});
+		return false;
+	});
+
+	//Start/Stop
+	$('#state').click(function(event) {
+		console.log($(this).val());
+		socket.emit('e_state', {value: $(this).val()});
+		return false;
+	});
+
+	//Adaptivny tempomat
+	$('#control').click(function(event) {
+		console.log($(this).val());
+		socket.emit('control_state', {value: $(this).val()});
+		return false;
+	});
+
+	//Odpojenie
+	$('#disconnect').click(function(event) {
+		console.log($(this).val());
+		socket.emit('disconnect_request');
+		alert("Boli ste odpojený !");
+		return false;
+	});
+
+	//Rychlost
+	$('#speed').on('input', function() {
+		console.log($(this).val());
+		socket.emit('speed_input', {value: $(this).val()});
+		return false;
+	});
+
+	//Riadenie
+	$('#steering').on('input', function() {
+		console.log($(this).val());
+		socket.emit('steering_input', {value: $(this).val()});
+		return false;
+	});
+	////////////////////////////////////////////////////
+
+
+	//Spravanie grafu
 	socket.on('new_speed', function(msg) {
 		//console.log(msg.data);
 		gauge.value=msg.data;
@@ -24,85 +132,8 @@ $(document).ready(function() {
 		myLine.update();
 	});
 
-	socket.on('ovladanie_LED', function(msg) {
-		$('#btnLED').html(''+msg.data+'');
-		$('#btnLED').prop('value', ''+msg.data+'');
-	});
 
-	socket.on('auto_LED', function(msg) {
-		$('#btnAuto').html(''+msg.data+'');
-		$('#btnAuto').prop('value', ''+msg.data+'');
-	});
-
-	socket.on('control_response', function(msg) {
-		$('#control').html(''+msg.data+'');
-		$('#control').prop('value', ''+msg.data+'');
-	});
-
-	socket.on('lane_response', function(msg) {
-		$('#lane_assist').html(''+msg.data+'');
-		$('#lane_assist').prop('value', ''+msg.data+'');
-	});
-
-	socket.on('cruise_response', function(msg) {
-		$('#adapt_cruise').html(''+msg.data+'');
-		$('#adapt_cruise').prop('value', ''+msg.data+'');
-	});
-
-	$('#btnAuto').click(function(event) {
-		//console.log($(this).val());
-		socket.emit('svetla_auto', {value: $(this).val()});
-		return false;
-	});
-
-	$('#btnLED').click(function(event) {
-	  //console.log($(this).val());
-		socket.emit('svetla', {value: $(this).val()});
-		return false;
-	});
-
-	$('#lane_assist').click(function(event) {
-		//console.log($(this).val());
-		socket.emit('lane_request', {value: $(this).val()});
-		return false;
-	});
-
-	$('#adapt_cruise').click(function(event) {
-		//console.log($(this).val());
-		socket.emit('cruise_request', {value: $(this).val()});
-		return false;
-	});
-
-	$('#btnState').click(function(event) {
-		//console.log($(this).val());
-		socket.emit('e_state', {value: $(this).val()});
-		return false;
-	});
-
-	$('#control').click(function(event) {
-		//console.log($(this).val());
-		socket.emit('control_state', {value: $(this).val()});
-		return false;
-	});
-
-	$('#disconnect').click(function(event) {
-		//console.log($(this).val());
-		socket.emit('disconnect_request');
-		return false;
-	});
-
-	$('#speed').on('input', function() {
-		//console.log($(this).val());
-		socket.emit('speed_input', {value: $(this).val()});
-		return false;
-	});
-
-	$('#steering').on('input', function() {
-		//console.log($(this).val());
-		socket.emit('steering_input', {value: $(this).val()});
-		return false;
-	});
-
+	//Tachometer
 	var gauge = new RadialGauge({
 		renderTo: 'canvas-tachometer',
 		width: 300,
@@ -149,6 +180,7 @@ $(document).ready(function() {
 	})();
 });
 
+//Nastavenie grafu
 var chart_config = {
 	type: 'line',
 	data: {
@@ -172,14 +204,14 @@ var chart_config = {
 				display: true,
 				scaleLabel: {
 					display: true,
-					labelString: 'Time'
+					labelString: 'Time(s)'
 				}
 			}],
 			yAxes: [{
 				display: true,
 				scaleLabel: {
 					display: true,
-					labelString: 'Value'
+					labelString: 'Value(%)'
 				}
 			}]
 		}
