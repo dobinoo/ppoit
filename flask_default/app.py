@@ -53,11 +53,13 @@ def data_start_stop(number):
         if(number == "1"):
             data_writer.writerow([time.asctime()])
             data_writer.writerow(['LED','LED_mode','state','cruise_state','lane_state','speed_value','steering_value', 'control'])
+            print("Start zapisovania dat")
 
 
         if(number == "0"):
             data_writer.writerow([])
             data_writer.writerow([])
+            print("Ukoncenie zapisovania dat")
 
 
 #Formatovanie hodnot do string na poslanie
@@ -227,7 +229,7 @@ def test_message(message):
 
             #Generovanie dat do hlavicky data.csv
             data_start_stop("1")
-            print("Start zapisovania dat")
+
 
         else:
             state ='Stop'
@@ -240,7 +242,6 @@ def test_message(message):
 
             #Generovanie dat do footer-u data.csv
             data_start_stop("0")
-            print("Ukoncenie zapisovania dat")
 
             #Poslanie posledneho retazca
             ser.write("000000000050R")
@@ -252,9 +253,10 @@ def disconnect_request():
     global state
     state='Stop'
     data_start_stop("0")
-    #session['receive_count'] = session.get('receive_count', 0) + 1
-    #emit('my_response',
-    #     {'data': 'Disconnected!', 'count': session['receive_count']})
+
+    ser.write("000000000050R")
+    print("Poslanie posledneho stringu do arduina (0 0 0 0 0 0 000 050 R)")
+
     disconnect()
     print("\nDISCONNECTED\n\n")
 
